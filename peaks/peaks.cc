@@ -28,7 +28,7 @@
 #include "stmlib/utils/ring_buffer.h"
 #include "stmlib/system/system_clock.h"
 
-#include "peaks/drivers/dac.h"
+#include "peaks/drivers/pwm_dac.h"
 #include "peaks/drivers/debug_pin.h"
 #include "peaks/drivers/gate_input.h"
 #include "peaks/drivers/system.h"
@@ -44,7 +44,7 @@ using namespace stmlib;
 
 Adc adc;
 CalibrationData calibration_data;
-Dac dac;
+PWMDac pwm_dac;
 GateInput gate_input;
 IOBuffer io_buffer;
 Leds leds;
@@ -71,6 +71,11 @@ uint16_t counter = 0;
 
 void SysTick_Handler() {
   ui.Poll();
+  if(gate_input.ReadInput1()){
+    DebugPin::High();
+  } else {
+    DebugPin::Low();
+  }
 }
 
 GateFlags gate_flags[2];
@@ -82,7 +87,7 @@ void TIM1_UP_IRQHandler(void) {
   }
   TIM1->SR = (uint16_t)~TIM_IT_Update;
   
-  bool wrote_both_channels = dac.Update();
+  bool wrote_both_channels = pwm_dac.Update();
   if (!wrote_both_channels) {
     return;
   }
@@ -96,7 +101,7 @@ void TIM1_UP_IRQHandler(void) {
     gate_flags[i] = ExtractGateFlags(
         gate_flags[i],
         gate_inputs & (1 << i));
-    dac.Write(i, slice.block->output[i][slice.frame_index]);
+    pwm_dac.Write(i, slice.block->output[i][slice.frame_index]);
   }
   
   // A hack to make channel 1 aware of what's going on in channel 2. Used to
@@ -114,7 +119,7 @@ void TIM1_UP_IRQHandler(void) {
 int16_t output_buffer[kBlockSize];
 
 void Process(IOBuffer::Block* block, size_t size) {
-  // DebugPin::High();
+  //DebugPin::High();
   ui.PollPots();
   for (size_t i = 0; i < kNumChannels; ++i) {
     if (ui.calibrating()) {
@@ -127,23 +132,23 @@ void Process(IOBuffer::Block* block, size_t size) {
       block->output[i][j] = calibration_data.DacCode(i, output_buffer[j]);
     }
   }
-  // DebugPin::Low();
+  //DebugPin::Low();
 }
 
 void Init() {
-  sys.Init(F_CPU / 96000 - 1, true);
+  sys.Init(F_CPU / 96000 - 1, false);
   
   system_clock.Init();
   gate_input.Init();
   io_buffer.Init();
-  dac.Init();
+  pwm_dac.Init();
 
   calibration_data.Init();
   processors[0].Init(0);
   processors[1].Init(1);
   ui.Init(&calibration_data);
   
-  // DebugPin::Init();
+  DebugPin::Init();
   
   sys.StartTimers();
 }

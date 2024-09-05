@@ -47,7 +47,7 @@ void System::Init(uint32_t timer_period, bool application) {
       RCC_APB2Periph_AFIO, ENABLE);
   RCC_APB1PeriphClockCmd(
       RCC_APB1Periph_SPI2 |
-      RCC_APB1Periph_TIM3, ENABLE);
+      RCC_APB1Periph_TIM3 | RCC_APB1Periph_TIM4, ENABLE);
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
   
   GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);

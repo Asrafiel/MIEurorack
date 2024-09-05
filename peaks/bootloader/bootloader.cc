@@ -184,6 +184,9 @@ const uint16_t kPacketsPerPage = PAGE_SIZE / kPacketSize;
 int main(void) {
   Init();
 
+  JumpTo(kStartAddress);
+  while (1) { }
+
   bool exit_updater = !switches.pressed_immediate(2);
   while (!exit_updater) {
     bool error = false;

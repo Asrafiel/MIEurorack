@@ -31,7 +31,7 @@ DENSITY        = md
 MEMORY_MODE    = flash
 # USB            = enabled
 
-APPLICATION    = TRUE
+#APPLICATION    = TRUE
 BOOTLOADER     = peaks_bootloader
 
 # Preferred upload command

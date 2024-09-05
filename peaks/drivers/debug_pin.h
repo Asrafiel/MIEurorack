@@ -41,19 +41,19 @@ class DebugPin {
   
   static void Init() {
     GPIO_InitTypeDef gpio_init;
-    gpio_init.GPIO_Pin = GPIO_Pin_10;
+    gpio_init.GPIO_Pin = GPIO_Pin_5;
     gpio_init.GPIO_Speed = GPIO_Speed_2MHz;
     gpio_init.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_Init(GPIOA, &gpio_init);
-    GPIOA->BSRR = GPIO_Pin_10;
+    GPIO_Init(GPIOB, &gpio_init);
+    GPIOB->BSRR = GPIO_Pin_5;
   }
   
   static void High() {
-    GPIOA->BSRR = GPIO_Pin_10;
+    GPIOB->BSRR = GPIO_Pin_5;
   }
 
   static void Low() {
-    GPIOA->BRR = GPIO_Pin_10;
+    GPIOB->BRR = GPIO_Pin_5;
   }
   
  private:
